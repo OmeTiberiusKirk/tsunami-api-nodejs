@@ -9,6 +9,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
+    .addBearerAuth(undefined, 'access_token')
     .setTitle('Tsunami API')
     .setDescription('The tsunami API description')
     .setVersion('1.0')
