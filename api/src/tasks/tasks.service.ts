@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import * as fs from 'node:fs/promises';
-import { Earthquake } from 'src/earthquakes/earthquakes.entity';
-import { EarthquakesService } from 'src/earthquakes/earthquakes.service';
+import { Earthquake } from 'src/earthquake/earthquake.entity';
+import { EarthquakeService } from 'src/earthquake/earthquake.service';
 import { EventsGateway } from 'src/events/events.gateway';
 import * as xml2js from 'xml2js';
 
@@ -12,7 +12,7 @@ export class TasksService {
   private bound: number[][];
 
   constructor(
-    private eqService: EarthquakesService,
+    private eqService: EarthquakeService,
     private eventsGateway: EventsGateway,
   ) {
     void this.handleCron();

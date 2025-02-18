@@ -6,14 +6,14 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server } from 'node:http';
-import { EarthquakesService } from 'src/earthquakes/earthquakes.service';
+import { EarthquakeService } from 'src/earthquake/earthquake.service';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class EventsGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly eqService: EarthquakesService) {}
+  constructor(private readonly eqService: EarthquakeService) {}
 
   @SubscribeMessage('events')
   handleEvent(@MessageBody() data: string) {

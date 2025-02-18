@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
-import { Earthquake } from './earthquakes.entity';
+import { Earthquake } from './earthquake.entity';
 
-export const earthquakesProviders = [
+export const earthquakeProviders = [
   {
     provide: 'EARTHQUAKE_REPOSITORY',
     useFactory: (dataSource: DataSource) =>

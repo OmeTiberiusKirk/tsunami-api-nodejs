@@ -1,12 +1,12 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
-import { Earthquake } from './earthquakes.entity';
-import { GetBulletinDto } from './earthquakes.dto';
-import { Bulletin } from './earthquakes.resp';
+import { Earthquake } from './earthquake.entity';
+import { GetBulletinDto } from './earthquake.dto';
+import { BulletinIntf } from 'src/interfaces/earthquake.interface';
 
 @Injectable()
-export class EarthquakesService {
-  private readonly logger = new Logger(EarthquakesService.name);
+export class EarthquakeService {
+  private readonly logger = new Logger(EarthquakeService.name);
 
   constructor(
     @Inject('EARTHQUAKE_REPOSITORY')
@@ -72,9 +72,9 @@ export class EarthquakesService {
     }
   }
 
-  async findObservationPoints(simId: number): Promise<Bulletin[]> {
+  async findObservationPoints(simId: number): Promise<BulletinIntf[]> {
     try {
-      const rawData = await this.mrDataSource.query<Bulletin[]>(
+      const rawData = await this.mrDataSource.query<BulletinIntf[]>(
         `SELECT observe_point.observ_point_id, observe_point.province_t,
          observe_point.name_t, observe_point.lat_1, observe_point.lat_2, observe_point.lat_3,
          observe_point.long_1, observe_point.long_2, observe_point.long_3, observe_point.decimal_lat,

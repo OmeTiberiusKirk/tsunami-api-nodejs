@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { EventsGateway } from './events.gateway';
-import { EarthquakesModule } from 'src/earthquakes/earthquakes.module';
+import { EarthquakesModule } from 'src/earthquake/earthquake.module';
 
 @Module({
   imports: [EarthquakesModule],

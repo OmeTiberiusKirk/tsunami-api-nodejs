@@ -1,22 +1,22 @@
 import { Controller, Get, Logger, Query } from '@nestjs/common';
-import { GetBulletinDto } from './earthquakes.dto';
-import { EarthquakesService } from './earthquakes.service';
-import { Bulletin } from './earthquakes.resp';
+import { GetBulletinDto } from './earthquake.dto';
+import { EarthquakeService } from './earthquake.service';
 import { ApiOkResponse } from '@nestjs/swagger';
+import { BulletinIntf } from 'src/interfaces/earthquake.interface';
 
 @Controller('earthquakes')
-export class EarthquakesController {
-  private readonly logger = new Logger(EarthquakesController.name);
+export class EarthquakeController {
+  private readonly logger = new Logger(EarthquakeController.name);
 
-  constructor(private service: EarthquakesService) {}
+  constructor(private service: EarthquakeService) {}
 
   @Get('getbulletin')
   @ApiOkResponse({
-    type: [Bulletin],
+    type: [BulletinIntf],
   })
   async getbulletin(
     @Query() query: GetBulletinDto,
-  ): Promise<{ eta_results: Bulletin[] }> {
+  ): Promise<{ eta_results: BulletinIntf[] }> {
     try {
       const simId = await this.service.findSimResultId(query);
       if (simId) {
