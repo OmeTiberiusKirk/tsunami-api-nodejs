@@ -2,8 +2,6 @@ import {
   Body,
   Controller,
   Post,
-  HttpCode,
-  HttpStatus,
   UseGuards,
   Get,
   Request,
@@ -18,10 +16,9 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @HttpCode(HttpStatus.OK)
   @Post('login')
-  signIn(@Body() signInDto: AuthDto) {
-    return this.authService.signIn(signInDto.username, signInDto.password);
+  login(@Body() signInDto: AuthDto) {
+    return this.authService.login(signInDto);
   }
 
   @UseGuards(AuthGuard)

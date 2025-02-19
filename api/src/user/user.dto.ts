@@ -19,7 +19,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     required: true,
-    default: 'example@40.co.th',
+    default: 'jaruwanno1991@gmail.com',
   })
   @IsNotEmpty()
   @IsEmail()

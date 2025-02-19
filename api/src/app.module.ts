@@ -22,22 +22,19 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
     UserModule,
     MailerModule.forRoot({
       transport: {
-        host: 'localhost',
-        port: 1025,
-        ignoreTLS: true,
-        secure: false,
+        host: 'smtp.gmail.com',
+        port: 465,
         auth: {
-          user: process.env.MAILDEV_INCOMING_USER,
-          pass: process.env.MAILDEV_INCOMING_PASS,
+          user: 'nukool@40.co.th',
+          pass: 'nwop uzry nyon jbye',
         },
       },
       defaults: {
         from: '"No Reply" <no-reply@localhost>',
       },
-      preview: true,
       template: {
-        dir: process.cwd() + '/template/',
-        adapter: new PugAdapter(), // or new PugAdapter() or new EjsAdapter()
+        dir: __dirname + '/user/templates',
+        adapter: new PugAdapter(),
         options: {
           strict: true,
         },
