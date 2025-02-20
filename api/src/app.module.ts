@@ -1,13 +1,13 @@
-import { Module } from '@nestjs/common';
-import { EarthquakesModule } from './earthquake/earthquake.module';
-import { ScheduleModule } from '@nestjs/schedule';
-import { TasksModule } from './tasks/tasks.module';
-import { ConfigModule } from '@nestjs/config';
-import { EventsModule } from './events/events.module';
-import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
+import { Module } from '@nestjs/common'
+import { EarthquakesModule } from './earthquake/earthquake.module'
+import { ScheduleModule } from '@nestjs/schedule'
+import { TasksModule } from './tasks/tasks.module'
+import { ConfigModule } from '@nestjs/config'
+import { EventsModule } from './events/events.module'
+import { AuthModule } from './auth/auth.module'
+import { UserModule } from './user/user.module'
+import { MailerModule } from '@nestjs-modules/mailer'
+import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter'
 
 @Module({
   imports: [

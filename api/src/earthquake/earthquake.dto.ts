@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger'
+import { IsNotEmpty } from 'class-validator'
 
 export class GetBulletinDto {
   @ApiProperty({
@@ -7,33 +7,33 @@ export class GetBulletinDto {
     default: 12.1025,
   })
   @IsNotEmpty()
-  latitude: number;
+  latitude: number
 
   @ApiProperty({
     required: true,
     default: 92.8756,
   })
   @IsNotEmpty()
-  longitude: number;
+  longitude: number
 
   @ApiProperty({
     required: true,
     default: 9,
   })
   @IsNotEmpty()
-  magnitude: number;
+  magnitude: number
 
   @ApiProperty({
     required: true,
     default: 10,
   })
   @IsNotEmpty()
-  depth: number;
+  depth: number
 
   @ApiProperty({
     required: true,
     default: 1,
   })
   @IsNotEmpty()
-  grp_id: number;
+  grp_id: number
 }

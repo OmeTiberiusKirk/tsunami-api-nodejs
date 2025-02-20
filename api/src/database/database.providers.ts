@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import { DataSource } from 'typeorm'
 
 export const databaseProviders = [
   {
@@ -13,9 +13,9 @@ export const databaseProviders = [
         database: 'postgres',
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
         synchronize: true,
-      });
+      })
 
-      return dataSource.initialize();
+      return dataSource.initialize()
     },
   },
   {
@@ -28,9 +28,9 @@ export const databaseProviders = [
         username: 'root',
         password: '1q2w3e4r',
         database: 'tdssdb',
-      });
+      })
 
-      return dataSource.initialize();
+      return dataSource.initialize()
     },
   },
-];
+]

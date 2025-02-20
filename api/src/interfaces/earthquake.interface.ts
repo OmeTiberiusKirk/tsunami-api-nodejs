@@ -1,45 +1,45 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger'
 
 export class BulletinIntf {
   @ApiProperty()
-  observ_point_id: number;
+  observ_point_id: number
 
   @ApiProperty()
-  province_t: string;
+  province_t: string
 
   @ApiProperty()
-  name_t: number;
+  name_t: number
 
   @ApiProperty()
-  lat_1: string;
+  lat_1: string
 
   @ApiProperty()
-  lat_2: string;
+  lat_2: string
 
   @ApiProperty()
-  lat_3: string;
+  lat_3: string
 
   @ApiProperty()
-  long_1: string;
+  long_1: string
 
   @ApiProperty()
-  long_2: string;
+  long_2: string
 
   @ApiProperty()
-  long_3: string;
+  long_3: string
 
   @ApiProperty()
-  decimal_lat: number;
+  decimal_lat: number
 
   @ApiProperty()
-  decimal_long: number;
+  decimal_long: number
 
   @ApiProperty()
-  values: number;
+  values: number
 
   @ApiProperty()
-  type: string;
+  type: string
 
   @ApiProperty()
-  region_no: string;
+  region_no: string
 }

@@ -1,43 +1,64 @@
-import {
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { AuthDto } from './auth.dto';
-import { Repository } from 'typeorm';
-import { User } from 'src/user/user.entity';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
+import { AuthDto } from './auth.dto'
+import { Repository } from 'typeorm'
+import { User } from 'src/user/user.entity'
+import * as bcrypt from 'bcrypt'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger();
-
   constructor(
     @Inject('USER_REPOSITORY')
     private userRepository: Repository<User>,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
-  async login(values: AuthDto) {
+  async signin(values: AuthDto) {
     try {
       const user = await this.userRepository
         .createQueryBuilder('u')
         .where('u.email = :email', { email: values.username })
-        .getOne();
-      if (!user) throw new UnauthorizedException('Email not found.');
+        .getOne()
+      if (!user) throw new UnauthorizedException('Email not found.')
+      const isMatch = await bcrypt.compare(values.password, user.password)
 
-      if (user?.password !== values.password)
-        throw new UnauthorizedException('Password is invalid');
+      if (!isMatch) throw new UnauthorizedException('Password is invalid')
 
-      const payload = { sub: user.id, email: user.email };
-      // const { password, ...result } = user;
-      // TODO: Generate a JWT and return it here
-      // instead of the user object
-      return await this.jwtService.signAsync(payload);
+      const {accessToken, refreshToken} = await this.getTokens(user)
+      console.log(refreshToken)
+      
+      return accessToken
     } catch (error) {
-      throw <Error>error;
+      throw <Error>error
     }
+  }
+
+  private async getTokens(user: User) {
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(
+        {
+          sub: user.id,
+          email: user.email,
+        },
+        {
+          secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+          expiresIn: '15m',
+        },
+      ),
+      this.jwtService.signAsync(
+        {
+          sub: user.id,
+          email: user.email,
+        },
+        {
+          secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+          expiresIn: '7d',
+        },
+      ),
+    ])
+
+    return { accessToken, refreshToken }
   }
 }

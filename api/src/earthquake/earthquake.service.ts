@@ -1,13 +1,11 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
-import { Earthquake } from './earthquake.entity';
-import { GetBulletinDto } from './earthquake.dto';
-import { BulletinIntf } from 'src/interfaces/earthquake.interface';
+import { Inject, Injectable } from '@nestjs/common'
+import { DataSource, Repository } from 'typeorm'
+import { Earthquake } from './earthquake.entity'
+import { GetBulletinDto } from './earthquake.dto'
+import { BulletinIntf } from 'src/interfaces/earthquake.interface'
 
 @Injectable()
 export class EarthquakeService {
-  private readonly logger = new Logger(EarthquakeService.name);
-
   constructor(
     @Inject('EARTHQUAKE_REPOSITORY')
     private eqRepository: Repository<Earthquake>,
@@ -16,8 +14,8 @@ export class EarthquakeService {
   ) {}
 
   async getRecentEearthquakes() {
-    const eq = await this.eqRepository.find({});
-    return eq;
+    const eq = await this.eqRepository.find({})
+    return eq
   }
 
   async insertEarthquakges(values: Earthquake[]) {
@@ -39,22 +37,22 @@ export class EarthquakeService {
           ],
           ['uid'],
         )
-        .execute();
+        .execute()
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(error.stack);
+        throw new Error(error.stack)
       }
     }
   }
 
   async findSimResultId(query: GetBulletinDto): Promise<number | undefined> {
     try {
-      let depth = query.depth;
+      let depth = query.depth
 
       if (query.depth >= 0 && query.depth <= 29.9) {
-        depth = 10;
+        depth = 10
       } else {
-        depth = 30;
+        depth = 30
       }
 
       const rawData = await this.mrDataSource.query<{ id: number }[]>(
@@ -65,10 +63,10 @@ export class EarthquakeService {
           WHERE grp_id = ? AND magnitude >= ? AND depth >= ?
           ORDER BY depth, magnitude, R`,
         [query.latitude, query.longitude, 1, query.magnitude, depth],
-      );
-      return rawData?.[0]?.id;
+      )
+      return rawData?.[0]?.id
     } catch (error) {
-      throw <Error>error;
+      throw <Error>error
     }
   }
 
@@ -83,10 +81,10 @@ export class EarthquakeService {
         WHERE sim_result_id = ? AND observe_point.observ_point_id = sim_point_val.id_point
           AND sim_point_val.type = 'ETA'`,
         [simId],
-      );
-      return rawData;
+      )
+      return rawData
     } catch (error) {
-      throw <Error>error;
+      throw <Error>error
     }
   }
 }

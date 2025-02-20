@@ -1,35 +1,35 @@
-import { Entity, Column, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Unique } from 'typeorm'
 
 @Unique(['uid'])
 @Entity({ name: 'earthquakes' })
 export class Earthquake {
   @PrimaryGeneratedColumn()
-  id?: number;
+  id?: number
 
   @Column()
-  uid: string;
+  uid: string
 
   @Column({ length: 500 })
-  title: string;
+  title: string
 
   @Column({ type: 'text', nullable: true })
-  description?: string;
+  description?: string
 
   @Column('float')
-  latitude: number;
+  latitude: number
 
   @Column('float')
-  longitude: number;
+  longitude: number
 
   @Column('float')
-  magnitude: number;
+  magnitude: number
 
   @Column('float')
-  depth: number;
+  depth: number
 
   @Column('timestamptz')
-  time: Date;
+  time: Date
 
   @Column()
-  feed_from: string;
+  feed_from: string
 }

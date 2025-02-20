@@ -1,5 +1,5 @@
-import { DataSource } from 'typeorm';
-import { User } from './user.entity';
+import { DataSource } from 'typeorm'
+import { User } from './user.entity'
 
 export const userProviders = [
   {
@@ -7,4 +7,4 @@ export const userProviders = [
     useFactory: (dataSource: DataSource) => dataSource.getRepository(User),
     inject: ['PG_SOURCE'],
   },
-];
+]

@@ -1,5 +1,5 @@
-import { DataSource } from 'typeorm';
-import { Earthquake } from './earthquake.entity';
+import { DataSource } from 'typeorm'
+import { Earthquake } from './earthquake.entity'
 
 export const earthquakeProviders = [
   {
@@ -8,4 +8,4 @@ export const earthquakeProviders = [
       dataSource.getRepository(Earthquake),
     inject: ['PG_SOURCE'],
   },
-];
+]

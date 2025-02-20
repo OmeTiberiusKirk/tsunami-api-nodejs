@@ -5,7 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
-} from 'typeorm';
+} from 'typeorm'
 
 export enum UserRoles {
   ADMIN = 'admin',
@@ -15,35 +15,35 @@ export enum UserRoles {
 @Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn()
-  id?: number;
+  id?: number
 
   @Column({ length: 500 })
-  name: string;
+  name: string
 
   @Column({ length: 500 })
-  surName: string;
+  surName: string
 
   @Column({ unique: true })
-  email: string;
+  email: string
 
   @Column()
-  password: string;
+  password: string
 
   @Column({
     type: 'enum',
     enum: UserRoles,
   })
-  role: UserRoles;
+  role: UserRoles
 
   @Column('simple-array')
-  permissions: string[];
+  permissions: string[]
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date
 
   @DeleteDateColumn()
-  deletedAt: Date;
+  deletedAt: Date
 }
