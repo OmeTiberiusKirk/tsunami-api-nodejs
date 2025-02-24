@@ -32,7 +32,15 @@ services:
     ports:
       - 8001:8080
     networks:
-      - network 
+      - network
+  api:
+    build: .
+    container_name: tsunami-api
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - network
 volumes:
   postgres-data:
     driver: local
