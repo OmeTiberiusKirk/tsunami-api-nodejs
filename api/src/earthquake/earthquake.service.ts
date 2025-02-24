@@ -18,7 +18,7 @@ export class EarthquakeService {
     return eq
   }
 
-  async insertEarthquakges(values: Earthquake[]) {
+  async insertEarthquakes(values: Earthquake[]) {
     try {
       await this.eqRepository
         .createQueryBuilder()

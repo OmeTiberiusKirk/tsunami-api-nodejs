@@ -1,31 +1,40 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { Cron } from '@nestjs/schedule'
 import * as fs from 'node:fs/promises'
 import { Earthquake } from 'src/earthquake/earthquake.entity'
 import { EarthquakeService } from 'src/earthquake/earthquake.service'
 import { EventsGateway } from 'src/events/events.gateway'
-import * as xml2js from 'xml2js'
+import {
+  getGfzEarthquakes,
+  getTmdEarthquakes,
+  getUsgsEarthquakes,
+} from './utils'
 
 @Injectable()
 export class TasksService {
   private readonly logger = new Logger(TasksService.name)
   private bound: number[][]
+  readonly mode: 'development' | 'production'
 
   constructor(
     private eqService: EarthquakeService,
     private eventsGateway: EventsGateway,
+    readonly config: ConfigService,
   ) {
+    this.mode = config.get('NODE_ENV') || 'development'
+    void getUsgsEarthquakes(this.mode)
     void this.handleCron()
   }
 
   @Cron('* */3 * * * *')
   async handleCron() {
-    const values = await this.getEarthquakesFromFiles()
-    await this.insertEarthquakges(values)
+    const values = await this.getEarthquakes()
+    await this.insertEarthquakes(values)
     await this.eventsGateway.emitRecentEarthquakes()
   }
 
-  private async insertEarthquakges(values: Earthquake[]) {
+  private async insertEarthquakes(values: Earthquake[]) {
     try {
       const str = await this.readFile('/src/tasks/data/tsunami.geojson')
       values = values.filter((value) => {
@@ -35,117 +44,22 @@ export class TasksService {
         ])
       })
 
-      await this.eqService.insertEarthquakges(values)
+      await this.eqService.insertEarthquakes(values)
     } catch (error) {
       this.logger.error(error)
     }
   }
 
-  private async getEarthquakesFromFiles(): Promise<Earthquake[]> {
+  private async getEarthquakes(): Promise<Earthquake[]> {
     const values = await Promise.all([
       // tmd
-      new Promise<Earthquake[]>((resolve) => {
-        void (async () => {
-          try {
-            const data = await this.readFile('/src/tasks/data/tmd.xml')
-            xml2js
-              .parseStringPromise(data)
-              .then((res: Rss<TmdItem>) => {
-                const items = res.rss.channel[0].item
-                resolve(this.prepareTmdData(items))
-              })
-              .catch((err) => {
-                this.logger.error(err)
-              })
-          } catch (err) {
-            if (err instanceof Error) {
-              this.logger.error(err.stack)
-            }
-          }
-        })()
-      }),
+      getTmdEarthquakes(this.mode),
       // gfz
-      new Promise<Earthquake[]>((resolve) => {
-        void (async () => {
-          try {
-            const data = await this.readFile('/src/tasks/data/gfz.xml')
-
-            xml2js
-              .parseStringPromise(data)
-              .then((res: Rss<GfzItem>) => {
-                const items = res.rss.channel[0].item
-                resolve(this.prepareGfzData(items))
-              })
-              .catch((err) => {
-                this.logger.error(err)
-              })
-          } catch (error) {
-            this.logger.error(error)
-          }
-        })()
-      }),
+      getGfzEarthquakes(this.mode),
       // usgs
-      new Promise<Earthquake[]>((resolve) => {
-        void (async () => {
-          const data = await this.readFile('/src/tasks/data/usgs.json')
-          const usgs: { features: UsgsItem[] } = JSON.parse(data)
-          resolve(this.prepareUsgsData(usgs.features))
-        })()
-      }),
+      getUsgsEarthquakes(this.mode),
     ])
     return values.flat()
-  }
-
-  private prepareTmdData(items: TmdItem[]): Earthquake[] {
-    return items.map((item) => {
-      const splitted = item['tmd:time'][0].split(/\s+/)
-      const description = item.description[0].replace(/<.{1,2}>/g, ' ')
-      return {
-        uid: item.link[0].split('earthquake=')[1],
-        title: item.title[0],
-        description,
-        latitude: parseFloat(item['geo:lat'][0]),
-        longitude: parseFloat(item['geo:long'][0]),
-        magnitude: parseFloat(item['tmd:magnitude'][0]),
-        depth: parseFloat(item['tmd:depth'][0]),
-        time: new Date(`${splitted[0]}T${splitted[1]}Z`),
-        feed_from: 'tmd',
-      }
-    })
-  }
-
-  private prepareGfzData(items: GfzItem[]): Earthquake[] {
-    return items.map((item) => {
-      const a = item.description[0].split(' ')
-      const time = `${a[0]}T${a[1]}Z`
-      return {
-        uid: item.link[0].split('id=')[1],
-        title: item.title[0],
-        description: item.description[0],
-        latitude: parseFloat(a[2]),
-        longitude: parseFloat(a[3]),
-        magnitude: parseFloat(item.title[0].split(/\s+/)[1].slice(0, -1)),
-        depth: parseFloat(a[4]),
-        time: new Date(time),
-        feed_from: 'gfz',
-      }
-    })
-  }
-
-  private prepareUsgsData(items: UsgsItem[]): Earthquake[] {
-    return items.map((item) => {
-      return {
-        uid: item.id,
-        title: item.properties.title,
-        // description: '',
-        longitude: parseFloat(item.geometry.coordinates[0]),
-        latitude: parseFloat(item.geometry.coordinates[1]),
-        magnitude: item.properties.mag,
-        depth: parseFloat(item.geometry.coordinates[2]),
-        time: new Date(item.properties.time),
-        feed_from: 'usgs',
-      }
-    })
   }
 
   private async readFile(path: string) {
@@ -174,43 +88,5 @@ export class TasksService {
       point[1] <= maxLat &&
       point[1] >= minLat
     )
-  }
-}
-
-type Rss<Item> = {
-  rss: {
-    channel: {
-      item: Item[]
-    }[]
-  }
-}
-
-type TmdItem = {
-  title: string[]
-  description: string[]
-  link: string[]
-  'geo:lat': string[]
-  'geo:long': string[]
-  'tmd:magnitude': string[]
-  'tmd:depth': string[]
-  'tmd:time': string[]
-}
-
-type GfzItem = {
-  title: string[]
-  description: string[]
-  link: string[]
-}
-
-type UsgsItem = {
-  id: string
-  properties: {
-    title: string
-    mag: number
-    time: number
-  }
-  geometry: {
-    type: string
-    coordinates: string[]
   }
 }
