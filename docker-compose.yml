@@ -10,6 +10,11 @@ services:
       POSTGRES_PASSWORD: password
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "sh -c 'pg_isready -U ${PG_DB_USER} -d ${PG_DB_NAME}'" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     networks:
       - network
   mariadb:
@@ -23,6 +28,10 @@ services:
       - TZ=Asia/Bangkok
     volumes:
       - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
     networks:
       - network
   adminer:
@@ -39,6 +48,11 @@ services:
     restart: always
     ports:
       - 8080:8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mariadb:
+        condition: service_healthy
     networks:
       - network
 volumes:
