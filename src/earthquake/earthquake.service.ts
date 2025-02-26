@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 import { DataSource, Repository } from 'typeorm'
 import { Earthquake } from './earthquake.entity'
 import { GetBulletinDto } from './earthquake.dto'
@@ -6,6 +6,8 @@ import { BulletinIntf } from 'src/interfaces/earthquake.interface'
 
 @Injectable()
 export class EarthquakeService {
+  private readonly logger = new Logger(EarthquakeService.name)
+
   constructor(
     @Inject('EARTHQUAKE_REPOSITORY')
     private eqRepository: Repository<Earthquake>,
@@ -39,9 +41,7 @@ export class EarthquakeService {
         )
         .execute()
     } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(error.stack)
-      }
+      this.logger.error(error)
     }
   }
 

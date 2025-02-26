@@ -8,7 +8,7 @@ export const databaseProviders = [
     provide: 'PG_SOURCE',
     inject: [pgdbConfig.KEY],
     imports: [ConfigModule.forFeature(pgdbConfig)],
-    useFactory: async (config: ConfigType<typeof pgdbConfig>) => {
+    useFactory: (config: ConfigType<typeof pgdbConfig>) => {
       const dataSource = new DataSource(config)
       return dataSource.initialize()
     },
@@ -17,7 +17,7 @@ export const databaseProviders = [
     provide: 'MR_SOURCE',
     inject: [mrdbConfig.KEY],
     imports: [ConfigModule.forFeature(mrdbConfig)],
-    useFactory: async (config: ConfigType<typeof mrdbConfig>) => {
+    useFactory: (config: ConfigType<typeof mrdbConfig>) => {
       const dataSource = new DataSource(config)
       return dataSource.initialize()
     },

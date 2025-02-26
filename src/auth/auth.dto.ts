@@ -4,14 +4,14 @@ import { IsNotEmpty } from 'class-validator'
 export class AuthDto {
   @ApiProperty({
     required: true,
-    default: 'jaruwanno1991@gmail.com',
+    default: 'tsunami@example.com',
   })
   @IsNotEmpty()
   username: string
 
   @ApiProperty({
     required: true,
-    default: '$@7N2u!@qRooS4Qx@ODL',
+    default: 'abc456',
   })
   @IsNotEmpty()
   password: string

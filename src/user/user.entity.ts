@@ -1,3 +1,4 @@
+import { Role } from 'src/role/role.enum'
 import {
   Entity,
   Column,
@@ -6,11 +7,6 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
 } from 'typeorm'
-
-export enum UserRoles {
-  ADMIN = 'admin',
-  USER = 'user',
-}
 
 @Entity({ name: 'users' })
 export class User {
@@ -31,9 +27,9 @@ export class User {
 
   @Column({
     type: 'enum',
-    enum: UserRoles,
+    enum: Role,
   })
-  role: UserRoles
+  role: Role
 
   @Column('simple-array')
   permissions: string[]

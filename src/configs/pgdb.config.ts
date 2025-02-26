@@ -13,6 +13,5 @@ export default registerAs(
     password: process.env.PG_DB_PASS,
     database: process.env.PG_DB_NAME,
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-    synchronize: true,
   }),
 )

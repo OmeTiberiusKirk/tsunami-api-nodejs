@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { Repository } from 'typeorm'
 import { User } from './user.entity'
 import { CreateUserDto } from './user.dto'
@@ -6,13 +6,6 @@ import * as bcrypt from 'bcrypt'
 import * as crypto from 'crypto'
 import { MailerService } from '@nestjs-modules/mailer'
 import * as pug from 'pug'
-
-// This should be a real class/interface representing a user entity
-export type Users = {
-  userId: number
-  password: string
-  username: string
-}
 
 @Injectable()
 export class UserService {
