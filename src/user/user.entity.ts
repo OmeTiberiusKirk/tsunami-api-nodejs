@@ -1,4 +1,4 @@
-import { Role } from 'src/role/role.enum'
+import { Position, Role } from '../roles/roles.enum'
 import {
   Entity,
   Column,
@@ -24,6 +24,12 @@ export class User {
 
   @Column()
   password: string
+
+  @Column({
+    type: 'enum',
+    enum: Position,
+  })
+  position: Position
 
   @Column({
     type: 'enum',

@@ -27,7 +27,7 @@ export class TasksService {
     void this.handleCron()
   }
 
-  @Cron('* */3 * * * *')
+  @Cron('*/2 * * * *')
   async handleCron() {
     const values = await this.getEarthquakes()
     await this.insertEarthquakes(values)

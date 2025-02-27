@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { IsArray, IsEmail, IsEnum, IsNotEmpty } from 'class-validator'
-import { Role } from 'src/role/role.enum'
+import { Position, Role } from 'src/roles/roles.enum'
 
 export class CreateUserDto {
   @ApiProperty({
@@ -27,14 +27,21 @@ export class CreateUserDto {
 
   @ApiProperty({
     required: true,
-    default: 'user',
+    default: Position.PROVINCIAL,
+  })
+  @IsEnum(Position)
+  position: Position
+
+  @ApiProperty({
+    required: true,
+    default: Role.ADMIN,
   })
   @IsEnum(Role)
   role: Role
 
   @ApiProperty({
     required: true,
-    default: ['read', 'create', 'update'],
+    default: ['shared', 'modify', 'read', 'add', 'delete'],
   })
   @IsArray()
   permissions: string[]

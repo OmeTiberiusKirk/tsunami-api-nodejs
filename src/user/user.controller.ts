@@ -10,17 +10,21 @@ import {
 import { CreateUserDto } from './user.dto'
 import { TransformInterceptor } from 'src/interceptors/response.interceptor'
 import { UserService } from './user.service'
-import { Roles } from 'src/role/role.decorator'
-import { Role } from 'src/role/role.enum'
 import { AccessTokenGuard } from 'src/guards/jwt.guard'
+import { ApiBearerAuth } from '@nestjs/swagger'
+import { RolesGuard } from 'src/roles/roles.guard'
+import { Roles } from 'src/roles/roles.decorator'
+import { Role } from 'src/roles/roles.enum'
 
+@ApiBearerAuth()
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Post('create')
+  @UseGuards(RolesGuard)
+  @Roles(Role.SUPERADMIN)
   @UseGuards(AccessTokenGuard)
-  @Roles(Role.ADMIN)
   @UseInterceptors(TransformInterceptor)
   async create(@Body() data: CreateUserDto) {
     try {

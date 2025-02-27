@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 import { Repository } from 'typeorm'
 import { User } from './user.entity'
 import { CreateUserDto } from './user.dto'
@@ -9,24 +9,34 @@ import * as pug from 'pug'
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name)
+
   constructor(
     @Inject('USER_REPOSITORY')
     private userRepository: Repository<User>,
-    private readonly mailerService: MailerService,
+    private mailerService: MailerService,
   ) {}
 
   async create(values: CreateUserDto) {
     try {
       const password = this.generatePassword()
       const hashedPassword = await this.hashPassword(password)
+      const user = {
+        ...values,
+        password: hashedPassword,
+      }
       await this.userRepository
         .createQueryBuilder()
         .insert()
         .into(User)
-        .values({ ...values, password: hashedPassword })
+        .values(user)
         .execute()
+
       await this.sendPasswordToEmail(values, password)
+
+      return { ...user, password }
     } catch (error) {
+      this.logger.error(error)
       throw <Error>error
     }
   }

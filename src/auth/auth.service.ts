@@ -13,10 +13,12 @@ import * as bcrypt from 'bcrypt'
 import { ConfigType } from '@nestjs/config'
 import jwtConfig from 'src/configs/jwt.config'
 import jwtRefreshConfig from 'src/configs/jwt-refresh.config'
+import { Role } from 'src/roles/roles.enum'
 
 export type JwtPayload = {
   sub: number
   email: string
+  role: Role
 }
 
 @Injectable()
@@ -45,6 +47,7 @@ export class AuthService {
       const { accessToken, refreshToken } = await this.getTokens({
         sub: user.id || 0,
         email: user.email,
+        role: user.role,
       })
 
       return { accessToken, refreshToken }
@@ -62,27 +65,15 @@ export class AuthService {
     return { accessToken, refreshToken }
   }
 
-  private generateAccessToken({ sub, email }: JwtPayload) {
-    return this.jwtService.sign(
-      {
-        sub,
-        email,
-      },
-      {
-        secret: this.accessConfig.secret,
-        expiresIn: this.accessConfig.signOptions?.expiresIn,
-      },
-    )
+  private generateAccessToken(payload: JwtPayload) {
+    return this.jwtService.sign(payload, {
+      secret: this.accessConfig.secret,
+      expiresIn: this.accessConfig.signOptions?.expiresIn,
+    })
   }
 
-  private generateRefreshToken({ sub, email }: JwtPayload) {
-    return this.jwtService.sign(
-      {
-        sub,
-        email,
-      },
-      this.refreshConfig,
-    )
+  private generateRefreshToken(payload: JwtPayload) {
+    return this.jwtService.sign(payload, this.refreshConfig)
   }
 
   refresh(payload: JwtPayload) {

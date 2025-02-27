@@ -2,6 +2,9 @@ import { ApiProperty } from '@nestjs/swagger'
 
 export class BulletinIntf {
   @ApiProperty()
+  id: number
+
+  @ApiProperty()
   observ_point_id: number
 
   @ApiProperty()
