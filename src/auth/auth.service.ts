@@ -7,13 +7,12 @@ import {
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { AuthDto } from './auth.dto'
-import { Repository } from 'typeorm'
-import { User } from 'src/user/user.entity'
 import * as bcrypt from 'bcrypt'
 import { ConfigType } from '@nestjs/config'
 import jwtConfig from 'src/configs/jwt.config'
 import jwtRefreshConfig from 'src/configs/jwt-refresh.config'
-import { Role } from 'src/roles/roles.enum'
+import { PrismaService } from 'src/prisma.service'
+import { Role } from '@prisma/client';
 
 export type JwtPayload = {
   sub: number
@@ -23,22 +22,20 @@ export type JwtPayload = {
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger()
+  private readonly logger = new Logger(AuthService.name)
 
   constructor(
-    @Inject('USER_REPOSITORY') private userRepository: Repository<User>,
     private jwtService: JwtService,
     @Inject(jwtConfig.KEY) private accessConfig: ConfigType<typeof jwtConfig>,
     @Inject(jwtRefreshConfig.KEY)
     private refreshConfig: ConfigType<typeof jwtRefreshConfig>,
-  ) {}
+    private prisma: PrismaService
+  ) {
+  }
 
   async signin(values: AuthDto) {
     try {
-      const user = await this.userRepository
-        .createQueryBuilder('u')
-        .where('u.email = :email', { email: values.username })
-        .getOne()
+      const user = await this.prisma.user.findFirst({ where: { email: values.username } })
       if (!user) throw new UnauthorizedException('Email not found.')
       const isMatch = await bcrypt.compare(values.password, user.password)
 

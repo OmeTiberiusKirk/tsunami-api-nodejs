@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt'
 import * as crypto from 'crypto'
 import { MailerService } from '@nestjs-modules/mailer'
 import * as pug from 'pug'
+import { PrismaService } from 'src/prisma.service'
 
 @Injectable()
 export class UserService {
@@ -15,7 +16,33 @@ export class UserService {
     @Inject('USER_REPOSITORY')
     private userRepository: Repository<User>,
     private mailerService: MailerService,
-  ) {}
+    private prisma: PrismaService
+  ) {
+    void this.init()
+  }
+
+  async init() {
+
+    try {
+      const u = await this.prisma.user.findFirst({ where: { email: 'tsunami@example.com' } })
+      if (!u) {
+        await this.prisma.user.create({
+          data: {
+            name: 'super',
+            surname: 'admin',
+            email: 'tsunami@example.com',
+            password: await this.hashPassword('abc456'),
+            role: 'superadmin',
+            position: 'central',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }
+        })
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   async create(values: CreateUserDto) {
     try {
