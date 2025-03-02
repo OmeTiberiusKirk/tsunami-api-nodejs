@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { AuthController } from './auth.controller'
 import { JwtModule } from '@nestjs/jwt'
-import { userProviders } from 'src/user/user.provider'
 import { DatabaseModule } from 'src/database/database.module'
 import { AccessTokenStrategy } from '../strategies/accessToken.strategy'
 import jwtConfig from 'src/configs/jwt.config'
@@ -21,7 +20,6 @@ import { PrismaService } from 'src/prisma.service'
   providers: [
     PrismaService,
     AuthService,
-    ...userProviders,
     AccessTokenStrategy,
     RefreshTokenStrategy,
   ],

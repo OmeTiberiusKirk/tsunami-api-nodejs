@@ -1,45 +1,42 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
-import { DataSource, Repository } from 'typeorm'
-import { Earthquake } from './earthquake.entity'
+import { DataSource } from 'typeorm'
+import { Earthquake } from '@prisma/client'
 import { GetBulletinDto } from './earthquake.dto'
 import { BulletinIntf } from 'src/interfaces/earthquake.interface'
+import { PrismaService } from 'src/prisma.service'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class EarthquakeService {
   private readonly logger = new Logger(EarthquakeService.name)
+  private mode: 'development' | 'production'
 
   constructor(
-    @Inject('EARTHQUAKE_REPOSITORY')
-    private eqRepository: Repository<Earthquake>,
     @Inject('MR_SOURCE')
     private mrDataSource: DataSource,
-  ) {}
+    private prisma: PrismaService,
+    readonly config: ConfigService,
+  ) {
+    this.mode = config.get('NODE_ENV') || 'development'
+  }
 
   async getRecentEearthquakes() {
-    const eq = await this.eqRepository.find({})
+    const eq = await this.prisma.earthquake.findMany({
+      ...(this.mode == 'production' && {
+        where: {
+          time: { gte: new Date(Date.now() - (1000 * 60 * 60 * 24)) }
+        }
+      }),
+      take: 10
+    })
     return eq
   }
 
   async insertEarthquakes(values: Earthquake[]) {
     try {
-      await this.eqRepository
-        .createQueryBuilder()
-        .insert()
-        .into(Earthquake)
-        .values(values)
-        .orUpdate(
-          [
-            'title',
-            'description',
-            'latitude',
-            'longitude',
-            'magnitude',
-            'depth',
-            'time',
-          ],
-          ['uid'],
-        )
-        .execute()
+      values.forEach(async (value) => {
+        await this.prisma.earthquake.upsert({ where: { id: value.id }, update: {}, create: value })
+      })
     } catch (error) {
       this.logger.error(error)
     }

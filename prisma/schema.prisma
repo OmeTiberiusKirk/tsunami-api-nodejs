@@ -10,21 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-model User {
-  id       Int    @id @default(autoincrement())
-  name     String
-  surname  String
-  email    String @unique
-  password String
-  role     Role
-  position Position
-  permissions String[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime
-  deletedAt DateTime?
+  url      = env("PG_DATABASE_URL")
 }
 
 enum Role {
@@ -35,4 +21,30 @@ enum Role {
 enum Position {
   central
   provincial
+}
+
+model User {
+  id          Int       @id @default(autoincrement())
+  name        String
+  surname     String
+  email       String    @unique
+  password    String
+  role        Role
+  position    Position
+  permissions String[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  deletedAt   DateTime?
+}
+
+model Earthquake {
+  id String @id @db.VarChar(100)
+  title String @db.VarChar(200)
+  description String? @db.Text
+  latitude Float
+  longitude Float
+  magnitude Float
+  depth Float
+  time DateTime
+  feed_from String @db.VarChar(20)
 }

@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises'
 import * as xml2js from 'xml2js'
-import { Earthquake } from 'src/earthquake/earthquake.entity'
+import { Earthquake } from '@prisma/client'
 
 type Rss<Item> = {
   rss: {
@@ -111,7 +111,7 @@ const prepareTmdData = (items: TmdItem[]): Earthquake[] =>
     const splitted = item['tmd:time'][0].split(/\s+/)
     const description = item.description[0].replace(/<.{1,2}>/g, ' ')
     return {
-      uid: item.link[0].split('earthquake=')[1],
+      id: item.link[0].split('earthquake=')[1],
       title: item.title[0],
       description,
       latitude: parseFloat(item['geo:lat'][0]),
@@ -128,7 +128,7 @@ const prepareGfzData = (items: GfzItem[]): Earthquake[] =>
     const a = item.description[0].split(' ')
     const time = `${a[0]}T${a[1]}Z`
     return {
-      uid: item.link[0].split('id=')[1],
+      id: item.link[0].split('id=')[1],
       title: item.title[0],
       description: item.description[0],
       latitude: parseFloat(a[2]),
@@ -143,10 +143,11 @@ const prepareGfzData = (items: GfzItem[]): Earthquake[] =>
 const prepareUsgsData = (items: UsgsItem[]): Earthquake[] => {
   return items.map((item) => {
     return {
-      uid: item.id,
+      id: item.id,
       title: item.properties.title,
       longitude: parseFloat(item.geometry.coordinates[0]),
       latitude: parseFloat(item.geometry.coordinates[1]),
+      description: null,
       magnitude: item.properties.mag,
       depth: parseFloat(item.geometry.coordinates[2]),
       time: new Date(item.properties.time),

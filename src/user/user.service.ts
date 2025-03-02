@@ -1,37 +1,39 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
-import { Repository } from 'typeorm'
-import { User } from './user.entity'
+import { Injectable, Logger } from '@nestjs/common'
 import { CreateUserDto } from './user.dto'
 import * as bcrypt from 'bcrypt'
 import * as crypto from 'crypto'
 import { MailerService } from '@nestjs-modules/mailer'
 import * as pug from 'pug'
 import { PrismaService } from 'src/prisma.service'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name)
+  private adminEmail: string
+  private adminPass: string
 
   constructor(
-    @Inject('USER_REPOSITORY')
-    private userRepository: Repository<User>,
     private mailerService: MailerService,
-    private prisma: PrismaService
+    private prisma: PrismaService,
+    private config: ConfigService,
   ) {
     void this.init()
+    this.adminEmail = this.config.get('ADMIN_EMAIL') || 'tsunami@example.com'
+    this.adminPass = this.config.get('ADMIN_PASS') || 'P@ssw0rd'
   }
 
   async init() {
 
     try {
-      const u = await this.prisma.user.findFirst({ where: { email: 'tsunami@example.com' } })
+      const u = await this.prisma.user.findFirst({ where: { email: this.adminEmail } })
       if (!u) {
         await this.prisma.user.create({
           data: {
             name: 'super',
             surname: 'admin',
-            email: 'tsunami@example.com',
-            password: await this.hashPassword('abc456'),
+            email: this.adminEmail,
+            password: await this.hashPassword(this.adminPass),
             role: 'superadmin',
             position: 'central',
             createdAt: new Date(),
@@ -52,14 +54,9 @@ export class UserService {
         ...values,
         password: hashedPassword,
       }
-      await this.userRepository
-        .createQueryBuilder()
-        .insert()
-        .into(User)
-        .values(user)
-        .execute()
 
-      await this.sendPasswordToEmail(values, password)
+      await this.prisma.user.create({ data: user })
+      // await this.sendPasswordToEmail(values, password)
 
       return { ...user, password }
     } catch (error) {
@@ -88,7 +85,7 @@ export class UserService {
       process.cwd() + '/src/user/templates/test.pug',
     )
     const emailHTML = compiledFunction({
-      subject: `สวัสดี ${values.name} ${values.surName}`,
+      subject: `สวัสดี ${values.name} ${values.surname}`,
       receiver: {
         email: values.email,
         pass,

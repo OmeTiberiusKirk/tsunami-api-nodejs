@@ -15,10 +15,25 @@ CREATE TABLE "User" (
     "position" "Position" NOT NULL,
     "permissions" TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Earthquake" (
+    "id" VARCHAR(100) NOT NULL,
+    "title" VARCHAR(200) NOT NULL,
+    "description" TEXT,
+    "latitude" DOUBLE PRECISION NOT NULL,
+    "longitude" DOUBLE PRECISION NOT NULL,
+    "magnitude" DOUBLE PRECISION NOT NULL,
+    "depth" DOUBLE PRECISION NOT NULL,
+    "time" TIMESTAMP(3) NOT NULL,
+    "feed_from" VARCHAR(20) NOT NULL,
+
+    CONSTRAINT "Earthquake_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex

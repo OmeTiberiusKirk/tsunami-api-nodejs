@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Cron } from '@nestjs/schedule'
 import * as fs from 'node:fs/promises'
-import { Earthquake } from 'src/earthquake/earthquake.entity'
+import { Earthquake } from '@prisma/client'
 import { EarthquakeService } from 'src/earthquake/earthquake.service'
 import { EventsGateway } from 'src/events/events.gateway'
 import {

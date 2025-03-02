@@ -10,18 +10,18 @@ import { MailerModule } from '@nestjs-modules/mailer'
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter'
 import jwtConfig from './configs/jwt.config'
 import refreshJwtConfig from './configs/jwt-refresh.config'
-import pgdbConfig from './configs/pgdb.config'
 import mrdbConfig from './configs/mrdb.config'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [jwtConfig, refreshJwtConfig, pgdbConfig, mrdbConfig],
+      load: [jwtConfig, refreshJwtConfig, mrdbConfig],
+      envFilePath: '.env'
     }),
     EarthquakesModule,
-    // ScheduleModule.forRoot(),
-    // TasksModule,
+    ScheduleModule.forRoot(),
+    TasksModule,
     EventsModule,
     AuthModule,
     UserModule,
@@ -47,4 +47,4 @@ import mrdbConfig from './configs/mrdb.config'
     }),
   ],
 })
-export class AppModule {}
+export class AppModule { }
